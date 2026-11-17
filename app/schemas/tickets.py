@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
-from typing import Literal
+from typing import Literal, List
 
 class TicketCreate(BaseModel):
     title: str = Field(min_length=3, max_length=120)
@@ -26,3 +26,10 @@ class TicketRead(BaseModel):
     executor_id: UUID | None = None
     created_at: datetime
     updated_at: datetime
+
+class TicketListRead(BaseModel):
+    data: List[TicketRead]
+    total: int
+    limit: int
+    offset: int
+    has_next: bool
