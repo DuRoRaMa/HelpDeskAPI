@@ -39,7 +39,7 @@ def get_ticket(ticket_uuid: UUID):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
 
 
-@router.get("/", response_model=TicketListRead, status_code=status.HTTP_200_OK)
+@router.get("", response_model=TicketListRead, status_code=status.HTTP_200_OK)
 def get_tickets(sort_by: Annotated[Literal["created_at", "priority"], Query()] = "created_at",
                 order: Annotated[Literal["asc", "desc"], Query()] = "desc",
                 priority: Annotated[int | None, Query(ge=1, le=3)] = None,
