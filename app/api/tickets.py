@@ -40,12 +40,16 @@ def get_ticket(ticket_uuid: UUID):
 
 
 @router.get("/", response_model=TicketListRead, status_code=status.HTTP_200_OK)
-def get_tickets(priority: Annotated[int | None, Query(ge=1, le=3)] = None,
+def get_tickets(sort_by: Annotated[Literal["created_at", "priority"], Query()] = "created_at",
+                order: Annotated[Literal["asc", "desc"], Query()] = "desc",
+                priority: Annotated[int | None, Query(ge=1, le=3)] = None,
                 ticket_status: Annotated[Literal["new", "in_progress", "completed"] | None, Query(alias="status")] = None,
                 limit: Annotated[int, Query(ge=1, le=100)] = 10,
                 offset: Annotated[int, Query(ge=0)] = 0
             ):
+    
     result = []
+
     for data in tickets:
         if priority is not None and data.priority != priority:
             continue
@@ -53,6 +57,12 @@ def get_tickets(priority: Annotated[int | None, Query(ge=1, le=3)] = None,
         if ticket_status is not None and data.status != ticket_status:
             continue
         result.append(data)
+    
+    if sort_by == "created_at":
+        result.sort(key=lambda x: (x.created_at, x.priority), reverse=(order == "desc"))
+    else:
+        result.sort(key=lambda x: (x.priority, x.created_at), reverse=(order == "desc"))
+    
     total = len(result)
     has_next = offset + limit < total
     return TicketListRead(
